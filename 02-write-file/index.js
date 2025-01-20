@@ -20,14 +20,14 @@ const writeMessage = (message) => {
       writingStream.write(line + '\n');
       stdout.write(message);
     }
-})
-rl.on('close', () => {
-  stdout.write('GOOD BYE! ^_^');
-  writingStream.close();
-  process.exit(0)
-})
-rl.on('SIGINT', () => {
-  rl.close();
-});
+  })
+  rl.on('close', () => {
+    stdout.write('GOOD BYE! ^_^');
+    writingStream.close();
+    process.exit(0)
+  })
+  rl.on('SIGINT', () => {
+    rl.close();
+  });
 }
 writeMessage('Write your message, please.\n')
