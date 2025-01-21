@@ -11,6 +11,27 @@ const assetsFolder = path.join(__dirname, 'assets');
 const outputAssets = path.join(outputProjectDist, 'assets');
 const componentsFolder = path.join(__dirname, 'components');
 
+async function replaceHTMLTags() {
+  try {
+    // Чтение template.html
+    let template = await fsProms.readFile(templatePath, 'utf-8');
+    // Cписок файлов с компонентами
+    const componentsFiles = await fsProms.readdir(componentsFolder);
+    for (const file of componentsFiles) {
+      const fileName = path.parse(file).name; // имя файла без расширения
+      const componentContent = await fsProms.readFile(path.join(componentsFolder, file), 'utf-8');
+      const replasedTag = `{{${fileName}}}`;
+      // Замена тегов в шаблоне на содержимое компонента 
+      template = template.replaceAll(replasedTag, componentContent);
+    }
+    await fsProms.writeFile(outputHTML, template, 'utf-8');
+  } catch (err) {
+    console.error("Error replacing HTML tags:", err);
+  }
+}
+
+replaceHTMLTags()
+
 const stylesArr = [];
 async function mergeStyles() {
   try {
@@ -37,11 +58,11 @@ async function copyDir(src, dest) {
     for (const file of filesInFolder) {
       const currPath = path.join(src, file.name);
       const copyPath = path.join(dest, file.name);
-      if (file.isDirectory()) {
+      if (file.isFile()) {
         //console.log(`Copying ${file.name} is completed`);
-        await copyDir(currPath, copyPath)
-      } else {
         await fsProms.copyFile(currPath, copyPath);
+      } else {
+        await copyDir(currPath, copyPath)
       }
     }
   } catch (err) {
